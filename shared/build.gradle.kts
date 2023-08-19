@@ -48,6 +48,9 @@ kotlin {
                 implementation("dev.icerock.moko:mvvm-compose:0.16.1")
                 implementation("dev.icerock.moko:mvvm-flow:0.16.1")
                 implementation("dev.icerock.moko:mvvm-flow-compose:0.16.1")
+                implementation("io.insert-koin:koin-core:3.4.3")
+                // https://mvnrepository.com/artifact/io.insert-koin/koin-compose
+                implementation("io.insert-koin:koin-compose:1.0.4")
             }
         }
         val commonTest by getting {
