@@ -19,7 +19,7 @@ object ContactListContract {
         data object SaveContact : Event
         data class SelectContact(val contact: Contact) : Event
         data class EditContact(val contact: Contact) : Event
-        data object DeleteContact : Event
+        data class DeleteContact(val contactId: Long) : Event
     }
 
     sealed class Effect : UiEffect {
