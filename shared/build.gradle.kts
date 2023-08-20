@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
@@ -6,15 +8,14 @@ plugins {
 }
 
 kotlin {
-    android {
+    androidTarget {
         compilations.all {
             kotlinOptions {
                 jvmTarget = "17"
             }
         }
     }
-
-    targets.withType(org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget::class.java).all {
+    targets.withType(KotlinNativeTarget::class.java).all {
         binaries.withType(org.jetbrains.kotlin.gradle.plugin.mpp.Framework::class.java).all {
             export("dev.icerock.moko:mvvm-core:0.16.1")
         }
@@ -27,7 +28,6 @@ kotlin {
     ).forEach {
         it.binaries.framework {
             baseName = "shared"
-            isStatic = true
         }
     }
 
@@ -41,8 +41,7 @@ kotlin {
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
 
-                implementation("com.squareup.sqldelight:runtime:1.5.5")
-                implementation("com.squareup.sqldelight:coroutines-extensions:1.5.5")
+                implementation("app.cash.sqldelight:coroutines-extensions:2.0.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 implementation("dev.icerock.moko:mvvm-core:0.16.1")
                 implementation("dev.icerock.moko:mvvm-compose:0.16.1")

@@ -1,11 +1,16 @@
 package com.plcoding.contactscomposemultiplatform
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.plcoding.contactscomposemultiplatform.contacts.domain.Contact
-import com.plcoding.contactscomposemultiplatform.contacts.presentation.contact_list.ContactListContract
+import com.plcoding.contactscomposemultiplatform.contacts.data.SqlDelightContactsDataSource
 import com.plcoding.contactscomposemultiplatform.contacts.presentation.contact_list.ContactListScreen
+import com.plcoding.contactscomposemultiplatform.contacts.presentation.contact_list.ContactListViewModel
 import com.plcoding.contactscomposemultiplatform.core.prensentation.ContactsTheme
+import dev.icerock.moko.mvvm.compose.getViewModel
+import dev.icerock.moko.mvvm.compose.viewModelFactory
+import org.koin.compose.getKoin
 
 @Composable
 fun App(
@@ -16,28 +21,19 @@ fun App(
         darkTheme = darkTheme,
         dynamicColors = dynamicColors
     ) {
+        val sqlDelightContactsDataSource = getKoin().get<SqlDelightContactsDataSource>()
+        val viewModel = getViewModel(
+            key = "contact-list-screen",
+            factory = viewModelFactory {
+                ContactListViewModel(sqlDelightContactsDataSource = sqlDelightContactsDataSource)
+            }
+        )
+        val state by viewModel.uiState.collectAsState()
         ContactListScreen(
             modifier = Modifier,
             newContact = null,
-            state = ContactListContract.State(
-                contactsList = (0..50).map {
-                    Contact(
-                        it.toLong(),
-                        "$it",
-                        "${it + it}",
-                        "${it}.69@gmail.com",
-                        "${it * 100000000}",
-                        photo = null
-                    )
-                },
-                recentlyAddedContactsList = listOf(),
-                selectedContact = null,
-                isAddContactSheetOpen = false,
-                isSelectedContactSheetOpen = false,
-                firstNameError = null,
-                lastNameError = null,
-                emailError = null,
-                phoneNumberError = null
-            ), onEvent = {})
+            state = state,
+            onEvent = viewModel::handleEvent
+        )
     }
 }

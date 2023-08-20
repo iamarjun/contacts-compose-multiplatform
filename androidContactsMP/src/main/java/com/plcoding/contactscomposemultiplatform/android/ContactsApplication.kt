@@ -15,7 +15,8 @@ class ContactsApplication : Application() {
         startKoin {
             androidContext(this@ContactsApplication)
             androidLogger()
-            modules(appModule() + androidModule)
+            modules(androidModule)
+            modules(appModule())
         }
     }
 }

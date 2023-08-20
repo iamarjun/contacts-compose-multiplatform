@@ -13,10 +13,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.plcoding.contactscomposemultiplatform.contacts.data.SqlDelightContactsDataSource
 import com.plcoding.contactscomposemultiplatform.contacts.domain.Contact
 import com.plcoding.contactscomposemultiplatform.contacts.presentation.contact_list.components.ContactListItem
+import dev.icerock.moko.mvvm.compose.getViewModel
+import dev.icerock.moko.mvvm.compose.viewModelFactory
+import org.koin.compose.getKoin
 
 @Composable
 fun ContactListScreen(
