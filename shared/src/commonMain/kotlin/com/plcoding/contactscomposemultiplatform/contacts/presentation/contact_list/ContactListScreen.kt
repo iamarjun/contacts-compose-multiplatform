@@ -1,7 +1,10 @@
 package com.plcoding.contactscomposemultiplatform.contacts.presentation.contact_list
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,56 +16,85 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.plcoding.contactscomposemultiplatform.contacts.data.SqlDelightContactsDataSource
 import com.plcoding.contactscomposemultiplatform.contacts.domain.Contact
+import com.plcoding.contactscomposemultiplatform.contacts.presentation.contact_list.components.AddContactSheet
+import com.plcoding.contactscomposemultiplatform.contacts.presentation.contact_list.components.ContactDetailSheet
 import com.plcoding.contactscomposemultiplatform.contacts.presentation.contact_list.components.ContactListItem
-import dev.icerock.moko.mvvm.compose.getViewModel
-import dev.icerock.moko.mvvm.compose.viewModelFactory
-import org.koin.compose.getKoin
+import com.plcoding.contactscomposemultiplatform.contacts.presentation.contact_list.components.RecentlyAddedContacts
 
 @Composable
 fun ContactListScreen(
-    modifier: Modifier,
-    newContact: Contact?,
     state: ContactListContract.State,
-    onEvent: (ContactListContract.Event) -> Unit
+    newContact: Contact?,
+    onEvent: (ContactListContract.Event) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier,
         floatingActionButton = {
             FloatingActionButton(
-                modifier = Modifier,
-                onClick = { onEvent(ContactListContract.Event.OnAddPhotoClicked) },
-                shape = RoundedCornerShape(20.dp),
-                content = {
-                    Icon(
-                        imageVector = Icons.Rounded.PersonAdd,
-                        contentDescription = "Add Contact",
-                    )
-                }
-            )
+                onClick = {
+                    onEvent(ContactListContract.Event.OnAddNewContactClick)
+                },
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.PersonAdd,
+                    contentDescription = "Add contact"
+                )
+            }
         }
     ) {
         LazyColumn(
-            modifier = Modifier.padding(it)
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text(
-                    modifier = Modifier,
-                    text = "My Contacts ${state.contactsList.size}"
+                RecentlyAddedContacts(
+                    contacts = state.recentlyAddedContactsList,
+                    onClick = {
+                        onEvent(ContactListContract.Event.SelectContact(it))
+                    }
                 )
             }
 
-            items(state.contactsList) {
-                ContactListItem(modifier = Modifier, contact = it)
+            item {
+                Text(
+                    text = "My contacts (${state.contactsList.size})",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            items(state.contactsList) { contact ->
+                ContactListItem(
+                    contact = contact,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onEvent(ContactListContract.Event.SelectContact(contact))
+                        }
+                        .padding(horizontal = 16.dp)
+                )
             }
         }
-
     }
+
+    ContactDetailSheet(
+        isOpen = state.isSelectedContactSheetOpen,
+        selectedContact = state.selectedContact,
+        onEvent = onEvent,
+    )
+    AddContactSheet(
+        state = state,
+        newContact = newContact,
+        isOpen = state.isAddContactSheetOpen,
+        onEvent = { event ->
+            onEvent(event)
+        },
+    )
 }
